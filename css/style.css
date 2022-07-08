@@ -1,0 +1,13 @@
+.invalid {
+    color: red;
+    font-size: 17px;
+    font-weight: 700;
+}
+.invalid-input {
+    border: 2px solid red;
+    outline: 1px solid red;
+}
+.valid-input {
+    border: 2px solid green;
+    outline: 1px solid green;
+}
