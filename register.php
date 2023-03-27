@@ -1,6 +1,6 @@
 <?php
 $page_title = '';
-require_once "db_connect.php";
+require_once "includes/db_connect.php";
 
 $fullname = $email = $password = $confirm_password = "";
 $fullnameErr = $emailErr = $passwordErr = $cpasswordErr = $submitErr = "";
