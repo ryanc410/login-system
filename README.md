@@ -142,7 +142,9 @@ Add this to the signup form replacing the `newInputField` with the name of the n
 <br><br>
 
 #========================================================
+<br>
 Need to add insert query for newInputField!
+<br>
 #========================================================
 
 <br><br>
