@@ -2,71 +2,73 @@
 $page_title = '';
 require_once "db_connect.php";
 
-$username = $email = $password = $confirm_password = "";
-$username_err = $email_err = $password_err = $confirm_password_err = "";
+$fullname = $email = $password = $confirm_password = "";
+$fullnameErr = $emailErr = $passwordErr = $cpasswordErr = $submitErr = "";
 
 if($_SERVER["REQUEST_METHOD"] == "POST") {
-	if (empty(test_input($_POST["username"]))) {
-		$username_err = "Please enter a username.";
-	} elseif (!preg_match('/^[a-zA-Z0-9_]+$/', test_input($_POST["username"]))) {
-		$username_err = "Username can only contain letters, numbers, and underscores.";
+	if (empty(test_input($_POST["fullname"]))) {
+		$fullnameErr = "Please enter your first and last name.";
+	} elseif (!preg_match('/(^[A-Za-z]{2,25}\s[A-Za-z]{2,25}$)/', test_input($_POST["fullname"]))) {
+		$fullnameErr = "Your name can only contain letters and whitespace.";
 	} else {
-		$sql = "SELECT id FROM users WHERE username = ?";
-		if ($stmt = mysqli_prepare($link, $sql)) {
-			mysqli_stmt_bind_param($stmt, "s", $param_username);
+        $fullname = test_input($_POST['fullname']);
+    }
+    if (empty(test_input($_POST["email"]))) {
+        $emailErr = "Please enter a valid email address.";
+    } else {
+        $email = test_input($_POST["email"]);
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $emailErr = "Email address could not be validated";
+    } else {
+        $sql = "SELECT id FROM users WHERE email = ?";
+        if ($stmt = mysqli_prepare($link, $sql)) {
+            mysqli_stmt_bind_param($stmt, "s", $param_email);
 
-			$param_username = test_input($_POST["username"]);
+            $param_email = test_input($_POST["email"]);
 
-			if (mysqli_stmt_execute($stmt)) {
-				mysqli_stmt_store_result($stmt);
-				if (mysqli_stmt_num_rows($stmt) == 1) {
-					$username_err = "This username is already taken.";
-				} else {
-					$username = test_input($_POST["username"]);
-				}
-			} else {
-				echo "Oops! Something went wrong. Please try again later.";
-			}
-			mysqli_stmt_close($stmt);
-		}
-	}
-	    if (empty(test_input($_POST["email"]))) {
-		    $email_err = "Please enter a valid email address.";
-	    } else {
-		$email = test_input($_POST["email"]);
-		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-			$email_err = " Email address could not be validated";
-		}
+            if (mysqli_stmt_execute($stmt)) {
+                mysqli_stmt_store_result($stmt);
+                if (mysqli_stmt_num_rows($stmt) == 1) {
+                    $emailErr = "This Email Address is already associated with another account.";
+                } else {
+                    $emailErr = test_input($_POST["email"]);
+                }
+            } else {
+                $submitErr = "Oops! Something went wrong. Please try again later.";
+            }
+            mysqli_stmt_close($stmt);
+        }
+        }
 		if (empty(test_input($_POST["password"]))) {
-			$password_err = "Please enter a password.";
+			$passwordErr = "Please enter a password.";
 		} elseif (strlen(test_input($_POST["password"])) < 8) {
-			$password_err = "Password must have atleast 8 characters.";
+			$passwordErr = "Password must have atleast 8 characters.";
 		} else {
 			$password = test_input($_POST["password"]);
 		}
-		if (empty(test_input($_POST["confirm_password"]))) {
-			$confirm_password_err = "Please confirm password.";
+		if (empty(test_input($_POST["cpassword"]))) {
+			$cpasswordErr = "Please confirm your password.";
 		} else {
-			$confirm_password = test_input($_POST["confirm_password"]);
-			if (empty($password_err) && ($password != $confirm_password)) {
-				$confirm_password_err = "Passwords do not match.";
+			$cpassword = test_input($_POST["cpassword"]);
+			if (empty($passwordErr) && ($password != $cpassword)) {
+				$cpasswordErr = "Passwords do not match.";
 			}
 		}
-		if (empty($username_err) && empty($email_err) && empty($password_err) && empty($confirm_password_err)) {
+		if (empty($fullnameErr) && empty($emailErr) && empty($passwordErr) && empty($cpasswordErr)) {
 
-			$sql = "INSERT INTO users (username, email,  password) VALUES (?, ?, ?)";
+			$sql = "INSERT INTO users (full_name, email,  password) VALUES (?, ?, ?)";
 
 			if ($stmt = mysqli_prepare($link, $sql)) {
-				mysqli_stmt_bind_param($stmt, "sss", $param_username, $param_email, $param_password);
+				mysqli_stmt_bind_param($stmt, "sss", $param_fullname, $param_email, $param_password);
 
-				$param_username = $username;
+				$param_fullname = $fullname;
 				$param_email = $email;
 				$param_password = password_hash($password, PASSWORD_DEFAULT);
 
 				if (mysqli_stmt_execute($stmt)) {
 					header("location: login.php");
 				} else {
-					echo "Oops! Something went wrong. Please try again later.";
+					$submitErr = "Oops! Something went wrong. Please try again later.";
 				}
 				mysqli_stmt_close($stmt);
 			}
@@ -80,22 +82,10 @@ function test_input($data) {
 	$data = htmlspecialchars($data);
 	return $data;
 }
+
+include 'includes/header.php';
+include 'includes/navbar.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css" type="text/css">
-    <!-- Jquery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <!-- Page Title -->
-    <title><?php echo $page_title; ?></title>
-</head>
-<body>
 <div class="container-fluid mt-5">
     <div class="row d-flex justify-content-center">
         <div class="col-lg-5 col-sm-12 d-block mt-3">
@@ -103,42 +93,70 @@ function test_input($data) {
             <p>Fill out the form below to create a new account.</p>
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" id="registerForm">
                 <div class="mb-3 mt-3">
-                    <label for="username" class="mb-1">Username</label>
-                    <input type="text" class="form-control mb-1" name="username" id="username" />
-                    <span class="invalid-feedback"><?php echo $username_err; ?></span>
-                    <div class="username-msg"></div>
+                    <label for="fullname" class="mb-1">Full Name</label>
+                    <input type="text" class="form-control mb-1" name="fullname" id="fullname" title="Enter your first and last name" value="<?php echo htmlspecialchars($_POST['fullname']); ?>" required/>
+                    <span class="invalid-feedback">
+                        <!-- FullName Error -->
+                        <?php if($fullnameErr){
+                            echo $fullnameErr;
+                        }
+                        ?>
+                    </span>
+                    <div class="fullname-msg"></div>
                 </div>
                 <div class="mb-3">
                     <label for="email" class="mb-1">Email Address</label>
-                    <input type="email" class="form-control mb-1" name="email" id="email" />
-                    <span class="invalid-feedback"><?php echo $email_err; ?></span>
+                    <input type="email" class="form-control mb-1" name="email" id="email" title="Enter a valid Email Address" value="<?php echo htmlspecialchars($_POST['email']); ?>" required/>
+                    <span class="invalid-feedback">
+                        <!-- Email Error -->
+                        <?php if($emailErr){
+                            echo $emailErr;
+                        }
+                        ?>
+                        </span>
                     <div class="email-msg"></div>
                 </div>
                 <div class="row mb-3">
                     <div class="col">
                         <label for="password" class="mb-1">Password</label>
-                        <input type="password" class="form-control mb-1" name="password" id="password" />
-                        <span class="invalid-feedback"><?php echo $password_err; ?></span>
+                        <input type="password" class="form-control mb-1" name="password" id="password" title="Enter a strong password with atleast 8 characters" value="<?php echo htmlspecialchars($_POST['password']); ?>" required/>
+                        <span class="invalid-feedback">
+                            <!-- Password Error -->
+                            <?php if($passwordErr){
+                                echo $passwordErr;
+                            }  
+                            ?>
+                            </span>
                         <div class="password-msg"></div>
                     </div>
                     <div class="col">
                         <label for="confirm_password" class="mb-1">Confirm Password</label>
-                        <input type="password" class="form-control mb-1" name="confirm_password" id="confirm_password" />
-                        <span class="invalid-feedback"><?php echo $confirm_password_err; ?></span>
+                        <input type="password" class="form-control mb-1" name="cpassword" id="cpassword" title="Confirm your password" value="<?php echo htmlspecialchars($_POST['cpassword']); ?>" required/>
+                        <span class="invalid-feedback">
+                            <!-- Confirm Password Error -->
+                            <?php if($cpasswordErr){
+                                echo $cpasswordErr; 
+                            }
+                            ?>
+                            </span>
                         <div class="cpassword-msg"></div>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <input type="submit" id="submit-btn" class="submit-btn" disabled="disabled" value="Register" />
+                    <input type="submit" id="signup-submit" class="btn btn-primary float-end" value="Sign Up" />
+                    <span class="invalid-feedback">
+                    <!-- Submit Error -->
+                    <?php if($submitErr){
+                        echo $submitErr;
+                    }
+                    ?>
+                    </span>
                 </div>
                 <p>Already have an account? <a href="login.php">Login here</a>.</p>
             </form>
         </div>
     </div>
 </div>
-<!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
-<!-- Live Form Validation -->
-    <script src="js/validate.js" type="text/javascript"></script>
-</body>
-</html>
+<?php
+include 'includes/footer.php';
+?>
