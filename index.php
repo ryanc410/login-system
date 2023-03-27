@@ -1,12 +1,12 @@
 <?php
-$page_title = '';
+$page_title = 'Logged In User Welcome Page';
 
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: login.php");
     exit;
 }
-include 'includes/header.php';
-include 'includes/navbar.php';
+include 'header.php';
+include 'navbar.php';
 ?>
     <h1 class="my-5">Hi, <b><?php echo htmlspecialchars($_SESSION["username"]); ?></b>. Welcome to our site.</h1>
     <p>
@@ -14,5 +14,5 @@ include 'includes/navbar.php';
         <a href="logout.php" class="btn btn-danger ml-3">Sign Out of Your Account</a>
     </p>
 <?php
-include 'includes/footer.php';
+include 'footer.php';
 ?>
