@@ -91,7 +91,7 @@ include 'includes/navbar.php';
         <div class="col-lg-5 col-sm-12 d-block mt-3">
             <h2>New User Registration</h2>
             <p>Fill out the form below to create a new account.</p>
-            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" id="registerForm">
+            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" id="signup-form">
                 <div class="mb-3 mt-3">
                     <label for="fullname" class="mb-1">Full Name</label>
                     <input type="text" class="form-control mb-1" name="fullname" id="fullname" title="Enter your first and last name" value="<?php echo htmlspecialchars($_POST['fullname']); ?>" required/>
