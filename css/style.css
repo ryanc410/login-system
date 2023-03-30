@@ -1,13 +1,14 @@
-.invalid {
+.error {
     color: red;
     font-size: 17px;
-    font-weight: 700;
+    font-weight: 600;
+    font-style: italic;
 }
-.invalid-input {
-    border: 2px solid red;
-    outline: 1px solid red;
+.invalid {
+    border: 1.5px solid red;
+    outline: 1.5px solid red;
 }
-.valid-input {
-    border: 2px solid green;
-    outline: 1px solid green;
+.valid {
+    border: 1.5px solid limegreen;
+    outline: 1.5px solid limegreen;
 }
