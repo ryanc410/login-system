@@ -2,7 +2,7 @@ $(document).ready(function(){
     // Disable the submit button
     $("#signup-submit").prop("disabled", true);
     // Full name validation
-    $("#full_name").on("input", function(){
+    $("#fullname").on("input", function(){
         var name = $(this).val();
         // Matches a first name with max 25 characters, followed by a space and a last name with a max of 25 characters
         var validName = /(^[A-Za-z]{2,25}\s[A-Za-z]{2,25}$)/;
